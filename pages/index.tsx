@@ -60,43 +60,7 @@ const Home: NextPage = () => {
           implement your own custom user interface.
         </P>
         <div className="row">
-          <div className="col-md-4 col-xs-12">
-            <div className="box">
-              <H3>Documentation</H3>
-              <P>
-                Here are some useful documentation pieces that help you get
-                started.
-              </P>
-              <div className="row">
-                <DocsButton
-                  title="Get Started"
-                  href="https://www.ory.sh/docs/get-started"
-                  testid="get-started"
-                />
-                <DocsButton
-                  title="User Flows"
-                  href="https://www.ory.sh/docs/concepts/self-service"
-                  testid="user-flows"
-                />
-                <DocsButton
-                  title="Identities"
-                  href="https://www.ory.sh/docs/concepts/identity"
-                  testid="identities"
-                />
-                <DocsButton
-                  title="Sessions"
-                  href="https://www.ory.sh/docs/concepts/session"
-                  testid="sessions"
-                />
-                <DocsButton
-                  title="Bring Your Own UI"
-                  href="https://www.ory.sh/docs/guides/bring-your-user-interface"
-                  testid="customize-ui"
-                />
-              </div>
-            </div>
-          </div>
-          <div className="col-md-8 col-xs-12">
+          <div className="col-md-12">
             <div className="box">
               <H3>Session Information</H3>
               <P>
@@ -118,6 +82,7 @@ const Home: NextPage = () => {
             href="/login"
             disabled={hasSession}
             title={"Login"}
+            basePath={router.basePath}
           />
           <DocsButton
             unresponsive
@@ -125,19 +90,22 @@ const Home: NextPage = () => {
             href="/registration"
             disabled={hasSession}
             title={"Sign Up"}
+            basePath={router.basePath}
           />
           <DocsButton
             unresponsive
             testid="recover-account"
-            href="/recovery"
+            href={"/recovery"}
             disabled={hasSession}
             title="Recover Account"
+            basePath={router.basePath}
           />
           <DocsButton
             unresponsive
             testid="verify-account"
             href="/verification"
             title="Verify Account"
+            basePath={router.basePath}
           />
           <DocsButton
             unresponsive
@@ -145,6 +113,7 @@ const Home: NextPage = () => {
             href="/settings"
             disabled={!hasSession}
             title={"Account Settings"}
+            basePath={router.basePath}
           />
           <DocsButton
             unresponsive

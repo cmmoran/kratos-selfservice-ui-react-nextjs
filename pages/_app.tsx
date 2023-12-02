@@ -9,7 +9,13 @@ import { createGlobalStyle } from "styled-components"
 const GlobalStyle = createGlobalStyle((props: ThemeProps) =>
   globalStyles(props),
 )
+Object.assign(theme, {
+    primary30: '#9DC2FF',
+    primary60: '#2979FF',
+    primary70: '#2264D1',
 
+    borderRadius: '4px',
+});
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <div data-testid="app-react">

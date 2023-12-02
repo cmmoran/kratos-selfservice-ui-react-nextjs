@@ -9,7 +9,7 @@ const bundle = (config) => ({
   external: (id) => !/^[./]/.test(id),
 })
 
-export default [
+const bundles = [
   bundle({
     plugins: [esbuild({ tsconfig: "./tsconfig.lib.json" })],
     output: [
@@ -33,3 +33,5 @@ export default [
     },
   }),
 ]
+
+export default bundles

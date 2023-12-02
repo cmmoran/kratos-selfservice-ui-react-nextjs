@@ -48,6 +48,7 @@ export interface DocsButtonProps {
   testid: string
   disabled?: boolean
   unresponsive?: boolean
+  basePath?: string
 }
 
 export const DocsButton = ({
@@ -57,6 +58,7 @@ export const DocsButton = ({
   testid,
   disabled,
   unresponsive,
+  basePath = "",
 }: DocsButtonProps) => (
   <div className={cn("col-xs-4", { "col-md-12": !unresponsive })}>
     <div className="box">
@@ -64,7 +66,7 @@ export const DocsButton = ({
         onClick={onClick}
         disabled={disabled}
         data-testid={testid}
-        href={href}
+        href={basePath + (href ?? "")}
       >
         {title}
       </TextLeftButton>

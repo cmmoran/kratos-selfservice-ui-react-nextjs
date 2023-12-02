@@ -78,7 +78,7 @@ const Login: NextPage = () => {
               window.location.href = flow?.return_to
               return
             }
-            router.push("/")
+            return router.push("/")
           })
           .then(() => {})
           .catch(handleFlowError(router, "login", setFlow))

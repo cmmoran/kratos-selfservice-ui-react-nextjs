@@ -29,15 +29,19 @@ _(refer to the
 [NextJS documentation](https://nextjs.org/docs/basic-features/environment-variables)
 to learn how to configure the application)_:
 
-- `ORY_SDK_URL` _(required)_<br />The URL where ORY Kratos's Public API is
+- `ORY_SDK_URL`   _(required)_<br />The URL where ORY Kratos's Public API is
   located. If this app and ORY Kratos are running in the same private network,
   this should be the private network address _(e.g.
   `kratos-public.svc.cluster.local`)_.
+- `BASE_PATH`     _(optional)_<br />The `basePath` of this application for situations where it sits behind a reverse proxy like **traefik**.
+- `COOKIE_DOMAIN` _(optional)_<br />The `forceCookieDomain` for SSO across multiple subdomains (ie: `test0.example.com`, `test1.example.com`, ...).
 
 Example `.env.local`:
 
 ```
 ORY_SDK_URL=http://localhost:4433/
+BASE_PATH=
+COOKIE_DOMAIN=example.com
 ```
 
 <br />

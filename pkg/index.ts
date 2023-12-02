@@ -20,3 +20,4 @@ export * from "./hooks"
 export * from "./ui"
 export * from "./sdk"
 export * from "./styled"
+export const cookieDomain = process.env.COOKIE_DOMAIN ?? undefined
