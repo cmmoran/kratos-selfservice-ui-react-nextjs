@@ -9,13 +9,13 @@ import { createGlobalStyle } from "styled-components"
 const GlobalStyle = createGlobalStyle((props: ThemeProps) =>
   globalStyles(props),
 )
-Object.assign(theme, {
-    primary30: '#9DC2FF',
-    primary60: '#2979FF',
-    primary70: '#2264D1',
-
-    borderRadius: '4px',
-});
+if (process.env.THEME !== undefined) {
+  Object.assign(theme, {
+    primary30: (theme as any)[`${process.env.THEME}30`],
+    primary60: (theme as any)[`${process.env.THEME}60`],
+    primary70: (theme as any)[`${process.env.THEME}70`],
+  })
+}
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <div data-testid="app-react">

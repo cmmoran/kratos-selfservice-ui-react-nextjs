@@ -66,7 +66,7 @@ export const DocsButton = ({
         onClick={onClick}
         disabled={disabled}
         data-testid={testid}
-        href={basePath + (href ?? "")}
+        href={disabled ? "#;" : basePath + (href ?? "")}
       >
         {title}
       </TextLeftButton>

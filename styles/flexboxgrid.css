@@ -1,3 +1,6 @@
+.codebox {
+  text-wrap: inherit;
+}
 .container-fluid,
 .container {
   margin-right: auto;
