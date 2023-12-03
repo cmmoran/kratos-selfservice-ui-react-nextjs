@@ -21,7 +21,7 @@
   "typings": "dist/index.d.ts",
   "dependencies": {
     "@ory/client": "^1.4.3",
-    "@ory/integrations": "https://github.com/cmmoran/integrations.git",
+    "@ory/integrations": "github:cmmoran/integrations#wip/yuno-postinstall",
     "@ory/themes": "~0.0.101",
     "classnames": "^2.3.1",
     "next": "12.2.4",
