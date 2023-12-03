@@ -26,10 +26,11 @@ const Login: NextPage = () => {
     // to perform two-factor authentication/verification.
     aal,
   } = router.query
+  const { isReady } = router
 
   // This might be confusing, but we want to show the user an option
   // to sign out if they are performing two-factor authentication!
-  const onLogout = LogoutLink([aal, refresh])
+  const onLogout = LogoutLink(router)
 
   useEffect(() => {
     // If the router is not ready yet, or we already have a flow, do nothing.
@@ -39,27 +40,49 @@ const Login: NextPage = () => {
 
     // If ?flow=.. was in the URL, we fetch it
     if (flowId) {
+      const controller = new AbortController()
       ory
-        .getLoginFlow({ id: String(flowId) })
+        .getLoginFlow({ id: String(flowId) }, { signal: controller.signal })
         .then(({ data }) => {
           setFlow(data)
         })
-        .catch(handleGetFlowError(router, "login", setFlow))
-      return
+        .catch((err) => {
+          if (!controller.signal.aborted) {
+            handleGetFlowError(router, "login", setFlow)(err)
+          } else {
+            console.log("getLoginFlow signal aborted")
+          }
+        })
+      return () => {
+        controller.abort()
+      }
     }
 
+    const controller = new AbortController()
     // Otherwise we initialize it
     ory
-      .createBrowserLoginFlow({
-        refresh: Boolean(refresh),
-        aal: aal ? String(aal) : undefined,
-        returnTo: returnTo ? String(returnTo) : undefined,
-      })
+      .createBrowserLoginFlow(
+        {
+          refresh: Boolean(refresh),
+          aal: aal ? String(aal) : undefined,
+          returnTo: returnTo ? String(returnTo) : undefined,
+        },
+        { signal: controller.signal },
+      )
       .then(({ data }) => {
         setFlow(data)
       })
-      .catch(handleFlowError(router, "login", setFlow))
-  }, [flowId, router, router.isReady, aal, refresh, returnTo, flow])
+      .catch((err) => {
+        if (!controller.signal.aborted) {
+          handleGetFlowError(router, "login", setFlow)(err)
+        } else {
+          console.log("getLoginFlow signal aborted")
+        }
+      })
+    return () => {
+      controller.abort()
+    }
+  }, [flowId, router, isReady, aal, refresh, returnTo, flow])
 
   const onSubmit = (values: UpdateLoginFlowBody) =>
     router
@@ -78,7 +101,7 @@ const Login: NextPage = () => {
               window.location.href = flow?.return_to
               return
             }
-            return router.push("/")
+            router.push("/")
           })
           .then(() => {})
           .catch(handleFlowError(router, "login", setFlow))

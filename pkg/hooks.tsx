@@ -1,17 +1,18 @@
 import { AxiosError } from "axios"
-import { useRouter } from "next/router"
-import { useState, useEffect, DependencyList } from "react"
+import { NextRouter } from "next/router"
+import { useEffect, useState } from "react"
 
 import ory from "./sdk"
 
 // Returns a function which will log the user out
-export function LogoutLink(deps?: DependencyList) {
+export function LogoutLink(router: NextRouter) {
   const [logoutToken, setLogoutToken] = useState<string>("")
-  const router = useRouter()
+  const { aal, refresh } = router.query
 
   useEffect(() => {
+    const controller = new AbortController()
     ory
-      .createBrowserLogoutFlow()
+      .createBrowserLogoutFlow({}, { signal: controller.signal })
       .then(({ data }) => {
         setLogoutToken(data.logout_token)
       })
@@ -25,7 +26,10 @@ export function LogoutLink(deps?: DependencyList) {
         // Something else happened!
         return Promise.reject(err)
       })
-  }, deps)
+    return () => {
+      controller.abort()
+    }
+  }, [aal, refresh])
 
   return () => {
     if (logoutToken) {

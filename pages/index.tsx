@@ -14,11 +14,12 @@ const Home: NextPage = () => {
   )
   const [hasSession, setHasSession] = useState<boolean>(false)
   const router = useRouter()
-  const onLogout = LogoutLink()
+  const onLogout = LogoutLink(router)
 
   useEffect(() => {
+    const controller = new AbortController()
     ory
-      .toSession()
+      .toSession({}, { signal: controller.signal })
       .then(({ data }) => {
         setSession(JSON.stringify(data, null, 2))
         setHasSession(true)
@@ -41,6 +42,9 @@ const Home: NextPage = () => {
         // Something else happened!
         return Promise.reject(err)
       })
+    return () => {
+      controller.abort()
+    }
   }, [router])
 
   return (
