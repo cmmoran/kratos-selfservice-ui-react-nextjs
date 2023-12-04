@@ -97,6 +97,7 @@ const Registration: NextPage = () => {
         return Promise.reject(err)
       })
   }
+  const loginPath = router.basePath ? `${router.basePath}/login` : "/login"
 
   return (
     <>
@@ -109,7 +110,7 @@ const Registration: NextPage = () => {
         <Flow onSubmit={onSubmit} flow={flow} />
       </MarginCard>
       <ActionCard>
-        <CenterLink data-testid="cta-link" href="/login">
+        <CenterLink data-testid="cta-link" href={loginPath}>
           Sign in
         </CenterLink>
       </ActionCard>
