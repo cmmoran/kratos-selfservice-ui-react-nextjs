@@ -11,7 +11,7 @@ const bundle = (config) => ({
 
 const bundles = [
   bundle({
-    plugins: [esbuild({ tsconfig: "./tsconfig.lib.json" })],
+    plugins: [esbuild({ tsconfig: "./tsconfig.lib.json", exclude: /dist/ })],
     output: [
       {
         file: `${name}.js`,

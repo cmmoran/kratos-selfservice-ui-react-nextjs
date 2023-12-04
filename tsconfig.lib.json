@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "declaration": true,
+    "incremental": false,
     "target": "esnext",
     "module": "commonjs",
     "noImplicitAny": true,

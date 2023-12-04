@@ -1,6 +1,6 @@
 {
   "name": "@ory/integration-react",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "config": {
     "prettierTarget": "**/*.{tsx,ts,json,md,js,css}"
   },
@@ -14,14 +14,15 @@
     "build:lib": "rm -rf dist && rollup -c",
     "prepublishOnly": "npm run build:lib",
     "test": "cypress run",
-    "test:dev": "cypress open"
+    "test:dev": "cypress open",
+    "postinstall": "cd node_modules/@ory/integrations && npm install && npm run build"
   },
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "typings": "dist/index.d.ts",
   "dependencies": {
     "@ory/client": "^1.4.3",
-    "@ory/integrations": "file:../integrations",
+    "@ory/integrations": "github:cmmoran/integrations#v0.0.14",
     "@ory/themes": "~0.0.101",
     "classnames": "^2.3.1",
     "next": "12.2.4",
@@ -43,6 +44,7 @@
     "@types/request": "^2.48.7",
     "@types/styled-components": "^5.1.13",
     "cypress": "^10.3.0",
+    "esbuild": "0.12.28",
     "eslint": "7.32.0",
     "eslint-config-next": "12.0.3",
     "ory-prettier-styles": "^1.1.2",

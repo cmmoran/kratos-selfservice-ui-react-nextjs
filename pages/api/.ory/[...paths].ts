@@ -1,11 +1,10 @@
 // @ory/integrations offers a package for integrating with NextJS.
 import { config, createApiHandler } from "@ory/integrations/next-edge"
 
-import { cookieDomain } from "../../../pkg"
-
 // We need to export the config.
 export { config }
 
+const cookieDomain = process.env.COOKIE_DOMAIN || undefined
 // And create the API "bridge".
 export default createApiHandler({
   fallbackToPlayground: false,
