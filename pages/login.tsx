@@ -34,7 +34,7 @@ const Login: NextPage = () => {
 
   useEffect(() => {
     // If the router is not ready yet, or we already have a flow, do nothing.
-    if (!router.isReady || flow) {
+    if (!isReady || flow) {
       return
     }
 

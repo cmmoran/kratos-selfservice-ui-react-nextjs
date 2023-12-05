@@ -16,6 +16,7 @@ import ory from "../pkg/sdk"
 const Registration: NextPage = () => {
   const router = useRouter()
 
+  const { isReady } = router
   // The "flow" represents a registration process and contains
   // information about the form we need to render (e.g. username + password)
   const [flow, setFlow] = useState<RegistrationFlow>()
@@ -26,7 +27,7 @@ const Registration: NextPage = () => {
   // In this effect we either initiate a new registration flow, or we fetch an existing registration flow.
   useEffect(() => {
     // If the router is not ready yet, or we already have a flow, do nothing.
-    if (!router.isReady || flow) {
+    if (!isReady || flow) {
       return
     }
 
@@ -51,7 +52,7 @@ const Registration: NextPage = () => {
         setFlow(data)
       })
       .catch(handleFlowError(router, "registration", setFlow))
-  }, [flowId, router, router.isReady, returnTo, flow])
+  }, [flowId, router, isReady, returnTo, flow])
 
   const onSubmit = async (values: UpdateRegistrationFlowBody) => {
     await router

@@ -41,11 +41,12 @@ const Settings: NextPage = () => {
 
   // Get ?flow=... from the URL
   const router = useRouter()
+  const { isReady } = router
   const { flow: flowId, return_to: returnTo } = router.query
 
   useEffect(() => {
     // If the router is not ready yet, or we already have a flow, do nothing.
-    if (!router.isReady || flow) {
+    if (!isReady || flow) {
       return
     }
 
@@ -69,7 +70,7 @@ const Settings: NextPage = () => {
         setFlow(data)
       })
       .catch(handleFlowError(router, "settings", setFlow))
-  }, [flowId, router, router.isReady, returnTo, flow])
+  }, [flowId, router, isReady, returnTo, flow])
 
   const onSubmit = (values: UpdateSettingsFlowBody) =>
     router
