@@ -44,18 +44,19 @@ const Login: NextPage = () => {
       ory
         .getLoginFlow({ id: String(flowId) }, { signal: controller.signal })
         .then(({ data }) => {
-          setFlow(data)
+          if (!controller.signal.aborted) {
+            setFlow(data)
+          }
         })
         .catch((err) => {
           if (!controller.signal.aborted) {
-            handleGetFlowError(router, "login", setFlow)(err)
-          } else {
-            console.log("getLoginFlow signal aborted")
+            return handleGetFlowError(router, "login", setFlow)(err)
           }
+
+          return Promise.reject(err)
         })
-      return () => {
-        controller.abort()
-      }
+
+      return () => controller.abort()
     }
 
     const controller = new AbortController()
@@ -70,18 +71,19 @@ const Login: NextPage = () => {
         { signal: controller.signal },
       )
       .then(({ data }) => {
-        setFlow(data)
+        if (!controller.signal.aborted) {
+          setFlow(data)
+        }
       })
       .catch((err) => {
         if (!controller.signal.aborted) {
-          handleGetFlowError(router, "login", setFlow)(err)
-        } else {
-          console.log("getLoginFlow signal aborted")
+          return handleGetFlowError(router, "login", setFlow)(err)
         }
+
+        return Promise.reject(err)
       })
-    return () => {
-      controller.abort()
-    }
+
+    return () => controller.abort()
   }, [flowId, router, isReady, aal, refresh, returnTo, flow])
 
   const onSubmit = (values: UpdateLoginFlowBody) =>

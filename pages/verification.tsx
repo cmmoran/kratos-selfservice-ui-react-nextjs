@@ -1,4 +1,4 @@
-import { VerificationFlow, UpdateVerificationFlowBody } from "@ory/client"
+import { UpdateVerificationFlowBody, VerificationFlow } from "@ory/client"
 import { CardTitle } from "@ory/themes"
 import { AxiosError } from "axios"
 import type { NextPage } from "next"
@@ -7,7 +7,7 @@ import Link from "next/link"
 import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
 
-import { Flow, ActionCard, CenterLink, MarginCard } from "../pkg"
+import { ActionCard, CenterLink, Flow, MarginCard } from "../pkg"
 import ory from "../pkg/sdk"
 
 const Verification: NextPage = () => {
@@ -26,10 +26,16 @@ const Verification: NextPage = () => {
 
     // If ?flow=.. was in the URL, we fetch it
     if (flowId) {
+      const controller = new AbortController()
       ory
-        .getVerificationFlow({ id: String(flowId) })
+        .getVerificationFlow(
+          { id: String(flowId) },
+          { signal: controller.signal },
+        )
         .then(({ data }) => {
-          setFlow(data)
+          if (!controller.signal.aborted) {
+            setFlow(data)
+          }
         })
         .catch((err: AxiosError) => {
           switch (err.response?.status) {
@@ -42,16 +48,23 @@ const Verification: NextPage = () => {
 
           throw err
         })
-      return
+
+      return () => controller.abort()
     }
 
+    const controller = new AbortController()
     // Otherwise we initialize it
     ory
-      .createBrowserVerificationFlow({
-        returnTo: returnTo ? String(returnTo) : undefined,
-      })
+      .createBrowserVerificationFlow(
+        {
+          returnTo: returnTo ? String(returnTo) : undefined,
+        },
+        { signal: controller.signal },
+      )
       .then(({ data }) => {
-        setFlow(data)
+        if (!controller.signal.aborted) {
+          setFlow(data)
+        }
       })
       .catch((err: AxiosError) => {
         switch (err.response?.status) {
@@ -62,6 +75,8 @@ const Verification: NextPage = () => {
 
         throw err
       })
+
+    return () => controller.abort()
   }, [flowId, router, isReady, returnTo, flow])
 
   const onSubmit = async (values: UpdateVerificationFlowBody) => {

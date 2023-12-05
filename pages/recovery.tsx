@@ -27,34 +27,57 @@ const Recovery: NextPage = () => {
 
     // If ?flow=.. was in the URL, we fetch it
     if (flowId) {
+      const controller = new AbortController()
       ory
-        .getRecoveryFlow({ id: String(flowId) })
+        .getRecoveryFlow({ id: String(flowId) }, { signal: controller.signal })
         .then(({ data }) => {
-          setFlow(data)
+          if (!controller.signal.aborted) {
+            setFlow(data)
+          }
         })
-        .catch(handleFlowError(router, "recovery", setFlow))
-      return
+        .catch((err) => {
+          if (!controller.signal.aborted) {
+            return handleFlowError(router, "recovery", setFlow)
+          }
+
+          return Promise.reject(err)
+        })
+
+      return () => controller.abort()
     }
 
+    const controller = new AbortController()
     // Otherwise we initialize it
     ory
       .createBrowserRecoveryFlow({
         returnTo: String(returnTo || ""),
       })
       .then(({ data }) => {
-        setFlow(data)
+        if (!controller.signal.aborted) {
+          setFlow(data)
+        }
       })
-      .catch(handleFlowError(router, "recovery", setFlow))
+      .catch((err) => {
+        if (!controller.signal.aborted) {
+          return handleFlowError(router, "recovery", setFlow)
+        }
+
+        return Promise.reject(err)
+      })
       .catch((err: AxiosError) => {
         // If the previous handler did not catch the error it's most likely a form validation error
         if (err.response?.status === 400) {
           // Yup, it is!
-          setFlow(err.response?.data as RecoveryFlow)
+          if (!controller.signal.aborted) {
+            setFlow(err.response?.data as RecoveryFlow)
+          }
           return
         }
 
         return Promise.reject(err)
       })
+
+    return () => controller.abort()
   }, [flowId, router, isReady, returnTo, flow])
 
   const onSubmit = (values: UpdateRecoveryFlowBody) =>

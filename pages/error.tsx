@@ -14,18 +14,22 @@ const Login: NextPage = () => {
 
   // Get ?id=... from the URL
   const router = useRouter()
+  const { isReady } = router
   const { id } = router.query
 
   useEffect(() => {
     // If the router is not ready yet, or we already have an error, do nothing.
-    if (!router.isReady || error) {
+    if (!isReady || error) {
       return
     }
 
+    const controller = new AbortController()
     ory
-      .getFlowError({ id: String(id) })
+      .getFlowError({ id: String(id) }, { signal: controller.signal })
       .then(({ data }) => {
-        setError(data)
+        if (!controller.signal.aborted) {
+          setError(data)
+        }
       })
       .catch((err: AxiosError) => {
         switch (err.response?.status) {
@@ -40,7 +44,9 @@ const Login: NextPage = () => {
 
         return Promise.reject(err)
       })
-  }, [id, router, router.isReady, error])
+
+    return () => controller.abort()
+  }, [id, router, isReady, error])
 
   if (!error) {
     return null

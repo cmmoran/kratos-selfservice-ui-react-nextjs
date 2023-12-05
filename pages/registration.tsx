@@ -33,25 +33,52 @@ const Registration: NextPage = () => {
 
     // If ?flow=.. was in the URL, we fetch it
     if (flowId) {
+      const controller = new AbortController()
       ory
-        .getRegistrationFlow({ id: String(flowId) })
+        .getRegistrationFlow(
+          { id: String(flowId) },
+          { signal: controller.signal },
+        )
         .then(({ data }) => {
           // We received the flow - let's use its data and render the form!
-          setFlow(data)
+          if (!controller.signal.aborted) {
+            setFlow(data)
+          }
         })
-        .catch(handleFlowError(router, "registration", setFlow))
-      return
+        .catch((err) => {
+          if (!controller.signal.aborted) {
+            return handleFlowError(router, "registration", setFlow)(err)
+          }
+
+          return Promise.reject(err)
+        })
+
+      return () => controller.abort()
     }
 
+    const controller = new AbortController()
     // Otherwise we initialize it
     ory
-      .createBrowserRegistrationFlow({
-        returnTo: returnTo ? String(returnTo) : undefined,
-      })
+      .createBrowserRegistrationFlow(
+        {
+          returnTo: returnTo ? String(returnTo) : undefined,
+        },
+        { signal: controller.signal },
+      )
       .then(({ data }) => {
-        setFlow(data)
+        if (!controller.signal.aborted) {
+          setFlow(data)
+        }
       })
-      .catch(handleFlowError(router, "registration", setFlow))
+      .catch((err) => {
+        if (!controller.signal.aborted) {
+          return handleFlowError(router, "registration", setFlow)(err)
+        }
+
+        return Promise.reject(err)
+      })
+
+    return () => controller.abort()
   }, [flowId, router, isReady, returnTo, flow])
 
   const onSubmit = async (values: UpdateRegistrationFlowBody) => {

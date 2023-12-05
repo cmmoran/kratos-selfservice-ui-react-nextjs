@@ -14,7 +14,9 @@ export function LogoutLink(router: NextRouter) {
     ory
       .createBrowserLogoutFlow({}, { signal: controller.signal })
       .then(({ data }) => {
-        setLogoutToken(data.logout_token)
+        if (!controller.signal.aborted) {
+          setLogoutToken(data.logout_token)
+        }
       })
       .catch((err: AxiosError) => {
         switch (err.response?.status) {
@@ -26,9 +28,8 @@ export function LogoutLink(router: NextRouter) {
         // Something else happened!
         return Promise.reject(err)
       })
-    return () => {
-      controller.abort()
-    }
+
+    return () => controller.abort()
   }, [aal, refresh])
 
   return () => {

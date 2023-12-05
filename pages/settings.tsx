@@ -52,24 +52,47 @@ const Settings: NextPage = () => {
 
     // If ?flow=.. was in the URL, we fetch it
     if (flowId) {
+      const controller = new AbortController()
       ory
-        .getSettingsFlow({ id: String(flowId) })
+        .getSettingsFlow({ id: String(flowId) }, { signal: controller.signal })
         .then(({ data }) => {
-          setFlow(data)
+          if (!controller.signal.aborted) {
+            setFlow(data)
+          }
         })
-        .catch(handleFlowError(router, "settings", setFlow))
-      return
+        .catch((err) => {
+          if (!controller.signal.aborted) {
+            return handleFlowError(router, "settings", setFlow)(err)
+          }
+
+          return Promise.reject(err)
+        })
+      return () => controller.abort()
     }
 
+    const controller = new AbortController()
     // Otherwise we initialize it
     ory
-      .createBrowserSettingsFlow({
-        returnTo: String(returnTo || ""),
-      })
+      .createBrowserSettingsFlow(
+        {
+          returnTo: String(returnTo || ""),
+        },
+        { signal: controller.signal },
+      )
       .then(({ data }) => {
-        setFlow(data)
+        if (!controller.signal.aborted) {
+          setFlow(data)
+        }
       })
-      .catch(handleFlowError(router, "settings", setFlow))
+      .catch((err) => {
+        if (!controller.signal.aborted) {
+          return handleFlowError(router, "settings", setFlow)(err)
+        }
+
+        return Promise.reject(err)
+      })
+
+    return () => controller.abort()
   }, [flowId, router, isReady, returnTo, flow])
 
   const onSubmit = (values: UpdateSettingsFlowBody) =>

@@ -21,8 +21,10 @@ const Home: NextPage = () => {
     ory
       .toSession({}, { signal: controller.signal })
       .then(({ data }) => {
-        setSession(JSON.stringify(data, null, 2))
-        setHasSession(true)
+        if (!controller.signal.aborted) {
+          setSession(JSON.stringify(data, null, 2))
+          setHasSession(true)
+        }
       })
       .catch((err: AxiosError) => {
         switch (err.response?.status) {
@@ -42,9 +44,8 @@ const Home: NextPage = () => {
         // Something else happened!
         return Promise.reject(err)
       })
-    return () => {
-      controller.abort()
-    }
+
+    return () => controller.abort()
   }, [router])
 
   return (
