@@ -1,4 +1,5 @@
-import { Card, CardTitle, P, H2, H3, CodeBox } from "@ory/themes"
+import { Session } from "@ory/client"
+import { Card, CardTitle, P, H2, H3 } from "@ory/themes"
 import { AxiosError } from "axios"
 import type { NextPage } from "next"
 import Head from "next/head"
@@ -9,9 +10,7 @@ import { DocsButton, MarginCard, LogoutLink } from "../pkg"
 import ory from "../pkg/sdk"
 
 const Home: NextPage = () => {
-  const [session, setSession] = useState<string>(
-    "No valid Ory Session was found.\nPlease sign in to receive one.",
-  )
+  const [session, setSession] = useState<Session>()
   const [hasSession, setHasSession] = useState<boolean>(false)
   const router = useRouter()
   const onLogout = LogoutLink(router)
@@ -19,10 +18,10 @@ const Home: NextPage = () => {
   useEffect(() => {
     const controller = new AbortController()
     ory
-      .toSession({}, { signal: controller.signal })
+      .toSession({ tokenizeAs: "synergy-jwt" }, { signal: controller.signal })
       .then(({ data }) => {
         if (!controller.signal.aborted) {
-          setSession(JSON.stringify(data, null, 2))
+          setSession(data)
           setHasSession(true)
         }
       })
@@ -56,27 +55,18 @@ const Home: NextPage = () => {
       </Head>
 
       <MarginCard wide>
-        <CardTitle>Welcome to Ory!</CardTitle>
-        <P>
-          Welcome to the Ory Managed UI. This UI implements a run-of-the-mill
-          user interface for all self-service flows (login, registration,
-          recovery, verification, settings). The purpose of this UI is to help
-          you get started quickly. In the long run, you probably want to
-          implement your own custom user interface.
-        </P>
+        <CardTitle>Welcome to SSO</CardTitle>
+
         <div className="row">
           <div className="col-md-12">
             <div className="box">
-              <H3>Session Information</H3>
-              <P>
-                Below you will find the decoded Ory Session if you are logged
-                in.
-              </P>
-              <CodeBox
-                className="codebox"
-                data-testid="session-content"
-                code={session}
-              />
+              {hasSession ? (
+                <H3>
+                  Session ID: <b>{session?.id}</b>
+                </H3>
+              ) : (
+                <H3>No Session Information</H3>
+              )}
             </div>
           </div>
         </div>
@@ -122,6 +112,30 @@ const Home: NextPage = () => {
             href="/settings"
             disabled={!hasSession}
             title={"Account Settings"}
+            basePath={router.basePath}
+          />
+          <DocsButton
+            unresponsive
+            testid="transfer"
+            href="/api/transfer"
+            disabled={!hasSession}
+            title={"Initiate Transfer"}
+            basePath={router.basePath}
+          />
+          <DocsButton
+            unresponsive
+            testid="remote"
+            href="/remote"
+            disabled={!hasSession}
+            title={"Initiate (remote) auth"}
+            basePath={router.basePath}
+          />
+          <DocsButton
+            unresponsive
+            testid="remote_json"
+            href="/remote_json"
+            disabled={!hasSession}
+            title={"Initiate (remote_json) auth"}
             basePath={router.basePath}
           />
           <DocsButton
